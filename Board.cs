@@ -7,8 +7,9 @@ namespace maze
     class Board
     {
         const char CIRCLE = '\u25cf';
-        public TileType[,] _tile;
-        public int _size;
+        public TileType[,] TILE { get; private set; }
+        public int SIZE { get; private set; }
+        Player _player;
 
         public enum TileType
         {
@@ -16,13 +17,15 @@ namespace maze
             Wall
         }
 
-        public void Initialize(int size)
+        public void Initialize(int size, Player player)
         {
             if (size % 2 == 0)
                 return;
 
-            _tile = new TileType[size, size];
-            _size = size;
+            _player = player;
+
+            TILE = new TileType[size, size];
+            SIZE = size;
 
             //mazes for Programmers
             //GenerateByBinaryTree();
@@ -33,44 +36,44 @@ namespace maze
         {
             //Binary Tree Algorithm
             //길 막는 작업
-            for (int y = 0; y < _size; y++)
+            for (int y = 0; y < SIZE; y++)
             {
-                for (int x = 0; x < _size; x++)
+                for (int x = 0; x < SIZE; x++)
                 {
-                    //if (x == 0 || x == _size - 1 || y == 0 || y == _size - 1)
+                    //if (x == 0 || x == SIZE - 1 || y == 0 || y == SIZE - 1)
                     if (x % 2 == 0 || y % 2 == 0)
-                        _tile[y, x] = TileType.Wall;
+                        TILE[y, x] = TileType.Wall;
                     else
-                        _tile[y, x] = TileType.Empty;
+                        TILE[y, x] = TileType.Empty;
                 }
             }
             //랜덤으로 우측이나 아래로 길 뚫기
             Random rand = new Random();
-            for (int y = 0; y < _size; y++)
+            for (int y = 0; y < SIZE; y++)
             {
-                for (int x = 0; x < _size; x++)
+                for (int x = 0; x < SIZE; x++)
                 {
                     if (x % 2 == 0 || y % 2 == 0)
                         continue;
-                    if (y == _size - 2 && x == _size - 2)
+                    if (y == SIZE - 2 && x == SIZE - 2)
                         continue;
-                    if (y == _size - 2)
+                    if (y == SIZE - 2)
                     {
-                        _tile[y, x + 1] = TileType.Empty;
+                        TILE[y, x + 1] = TileType.Empty;
                         continue;
                     }
-                    if (x == _size - 2)
+                    if (x == SIZE - 2)
                     {
-                        _tile[y + 1, x] = TileType.Empty;
+                        TILE[y + 1, x] = TileType.Empty;
                         continue;
                     }
                     if (rand.Next(0, 2) == 0)
                     {
-                        _tile[y, x + 1] = TileType.Empty;
+                        TILE[y, x + 1] = TileType.Empty;
                     }
                     else
                     {
-                        _tile[y + 1, x] = TileType.Empty;
+                        TILE[y + 1, x] = TileType.Empty;
                     }
                 }
             }
@@ -79,46 +82,46 @@ namespace maze
         private void GenerateBySideWinder()
         {
             //길 막는 작업
-            for (int y = 0; y < _size; y++)
+            for (int y = 0; y < SIZE; y++)
             {
-                for (int x = 0; x < _size; x++)
+                for (int x = 0; x < SIZE; x++)
                 {
-                    //if (x == 0 || x == _size - 1 || y == 0 || y == _size - 1)
+                    //if (x == 0 || x == SIZE - 1 || y == 0 || y == SIZE - 1)
                     if (x % 2 == 0 || y % 2 == 0)
-                        _tile[y, x] = TileType.Wall;
+                        TILE[y, x] = TileType.Wall;
                     else
-                        _tile[y, x] = TileType.Empty;
+                        TILE[y, x] = TileType.Empty;
                 }
             }
             Random rand = new Random();
-            for (int y = 0; y < _size; y++)
+            for (int y = 0; y < SIZE; y++)
             {
                 int count = 1;
-                for (int x = 0; x < _size; x++)
+                for (int x = 0; x < SIZE; x++)
                 {
                     if (x % 2 == 0 || y % 2 == 0)
                         continue;
-                    if (y == _size - 2 && x == _size - 2)
+                    if (y == SIZE - 2 && x == SIZE - 2)
                         continue;
-                    if (y == _size - 2)
+                    if (y == SIZE - 2)
                     {
-                        _tile[y, x + 1] = TileType.Empty;
+                        TILE[y, x + 1] = TileType.Empty;
                         continue;
                     }
-                    if (x == _size - 2)
+                    if (x == SIZE - 2)
                     {
-                        _tile[y + 1, x] = TileType.Empty;
+                        TILE[y + 1, x] = TileType.Empty;
                         continue;
                     }
                     if (rand.Next(0, 2) == 0)
                     {
-                        _tile[y, x + 1] = TileType.Empty;
+                        TILE[y, x + 1] = TileType.Empty;
                         count++;
                     }
                     else
                     {
                         int randomIndex = rand.Next(0, count);
-                        _tile[y + 1, x - randomIndex * 2] = TileType.Empty;
+                        TILE[y + 1, x - randomIndex * 2] = TileType.Empty;
                         count = 1;
                     }
                 }
@@ -129,11 +132,18 @@ namespace maze
         {
             ConsoleColor prevColor = Console.ForegroundColor;
 
-            for (int y = 0; y < _size; y++)
+            for (int y = 0; y < SIZE; y++)
             {
-                for (int x = 0; x < _size; x++)
+                for (int x = 0; x < SIZE; x++)
                 {
-                    Console.ForegroundColor = GetTileColor(_tile[y, x]);
+                    //플레이어 좌표를 가져와서 그좌표 생상을 표시
+                    if( y == _player.PosY && x == _player.PosX)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                    }
+                    else
+                        Console.ForegroundColor = GetTileColor(TILE[y, x]);
+
                     Console.Write(CIRCLE);
                 }
                 Console.WriteLine();
