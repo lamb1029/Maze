@@ -9,6 +9,8 @@ namespace maze
         const char CIRCLE = '\u25cf';
         public TileType[,] TILE { get; private set; }
         public int SIZE { get; private set; }
+        public int DestY { get; private set; }
+        public int DestX { get; private set; }
         Player _player;
 
         public enum TileType
@@ -26,6 +28,8 @@ namespace maze
 
             TILE = new TileType[size, size];
             SIZE = size;
+            DestY = size - 2;
+            DestX = size - 2;
 
             //mazes for Programmers
             //GenerateByBinaryTree();
@@ -138,9 +142,9 @@ namespace maze
                 {
                     //플레이어 좌표를 가져와서 그좌표 생상을 표시
                     if( y == _player.PosY && x == _player.PosX)
-                    {
                         Console.ForegroundColor = ConsoleColor.Blue;
-                    }
+                    else if( y == DestY && x == DestX)
+                        Console.ForegroundColor = ConsoleColor.Yellow;
                     else
                         Console.ForegroundColor = GetTileColor(TILE[y, x]);
 

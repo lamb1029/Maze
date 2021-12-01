@@ -9,7 +9,7 @@ namespace maze
             Board board = new Board();
             Player player = new Player();
             board.Initialize(25, player);
-            player.Initialize(1, 1, board.SIZE - 2, board.SIZE - 2, board);
+            player.Initialize(1, 1, board);
 
             Console.CursorVisible = false;
 
